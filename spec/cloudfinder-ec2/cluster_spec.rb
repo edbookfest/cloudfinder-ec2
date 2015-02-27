@@ -1,4 +1,4 @@
-describe Cloudfinder::EC2::Cluster, :focus => true do
+describe Cloudfinder::EC2::Cluster do
   let (:cluster_name) { 'production' }
   let (:instances)     { Hash.new }
   subject { Cloudfinder::EC2::Cluster.new(cluster_name: cluster_name, role_instances: instances) }
