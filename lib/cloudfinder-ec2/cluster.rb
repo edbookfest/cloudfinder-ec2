@@ -4,72 +4,53 @@ module Cloudfinder
 
       attr_reader(:cluster_name)
 
-      # @param [Hash] args containing the cluster name and the instance data grouped by role
+      # @param [Hash] args containing the cluster name and the instances
       # @return [Cloudfinder::EC2::Cluster]
       def initialize(args)
         @cluster_name = args[:cluster_name]
-        @roles        = args[:role_instances]
+        @instances = args[:instances]
       end
 
       # @return [bool]
       def empty?
-        roles.empty?
+        instances.empty?
       end
 
       # @return [bool]
       def running?
-        ! empty?
+        !empty?
       end
 
       # @param [symbol] role
       # @return [bool]
       def has_role?(role)
-        roles.has_key?(role)
+        list_roles.include?(role)
       end
 
       # @param [string] instance_id
       # @return [bool]
       def has_instance?(instance_id)
-        all_instances do | instance |
-          if instance[:instance_id] === instance_id
-            return true
-          end
-        end
-
-        false
+        instances.any? {|instance| instance.instance_id == instance_id}
       end
-
 
       # @return [Array<symbol>]
       def list_roles
-        roles.keys
+        instances.group_by {|instance| instance.role}.keys
       end
 
       # @param [symbol] role
-      # @return [Array<Hash>]
+      # @return [Array<Cloudfinder::EC2::Instance>]
       def list_role_instances(role)
-        if has_role?(role)
-          roles[role]
-        else
-          []
-        end
+        instances.select {|instance| instance.role === role }
       end
 
       private
 
-      # @return [Hash]
-      def roles
-        @roles
+      # @return [Array<Cloudfinder::EC2::Instance>]
+      def instances
+        @instances
       end
 
-      # @return [Hash]
-      def all_instances
-        roles.each do | rolename, role_instances |
-          role_instances.each do | instance |
-            yield instance
-          end
-        end
-      end
     end
   end
 end

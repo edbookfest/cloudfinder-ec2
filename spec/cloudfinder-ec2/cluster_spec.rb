@@ -1,7 +1,7 @@
 describe Cloudfinder::EC2::Cluster do
   let (:cluster_name) { 'production' }
-  let (:instances)     { Hash.new }
-  subject { Cloudfinder::EC2::Cluster.new(cluster_name: cluster_name, role_instances: instances) }
+  let (:instances) { [] }
+  subject { Cloudfinder::EC2::Cluster.new(cluster_name: cluster_name, instances: instances) }
 
   shared_examples_for 'cluster' do
     it 'should have cluster name' do
@@ -9,7 +9,7 @@ describe Cloudfinder::EC2::Cluster do
     end
   end
 
-  shared_examples_for 'undefined role' do | rolename |
+  shared_examples_for 'undefined role' do |rolename|
     it "should not have #{rolename} role" do
       expect(subject).not_to have_role(rolename)
     end
@@ -19,13 +19,13 @@ describe Cloudfinder::EC2::Cluster do
     end
   end
 
-  shared_examples_for 'undefined instance' do | unknown_instance_id |
+  shared_examples_for 'undefined instance' do |unknown_instance_id|
     it 'should not have unknown instance' do
       expect(subject).not_to have_instance(unknown_instance_id)
     end
   end
 
-  shared_examples_for 'defined role with instances' do | role_name, instance_count |
+  shared_examples_for 'defined role with instances' do |role_name, instance_count|
     it "should have #{role_name} role" do
       expect(subject).to have_role(role_name)
     end
@@ -35,14 +35,18 @@ describe Cloudfinder::EC2::Cluster do
     end
   end
 
-  shared_examples_for 'running instance in role' do | role_name, instance_index, instance_id |
+  shared_examples_for 'running instance in role' do |role_name, instance_index, instance_id|
     it "should have the #{role_name}:##{instance_index} instance" do
       expect(subject).to have_instance(instance_id)
     end
 
+    it "should return instance object for #{role_name}:##{instance_index}" do
+      expect(subject.list_role_instances(role_name)[instance_index]).to be_a Cloudfinder::EC2::Instance
+    end
+
     it "should list the #{role_name}:##{instance_index} instance for the correct role" do
       listed_instance = subject.list_role_instances(role_name)[instance_index]
-      expect(listed_instance[:instance_id]).to eq(instance_id)
+      expect(listed_instance.instance_id).to eq(instance_id)
     end
   end
 
@@ -60,9 +64,9 @@ describe Cloudfinder::EC2::Cluster do
   end
 
   context 'when created with single db instance' do
-    before :each do
-      instances[:db] = [{:instance_id => 'i-0000001'}]
-    end
+    let (:instances) { [
+        stub_instance(:instance_id => 'i-0000001', :role => :db)
+    ] }
 
     it { should_not be_empty }
     it { should be_running }
@@ -78,9 +82,10 @@ describe Cloudfinder::EC2::Cluster do
   end
 
   context 'when created with multiple db instances' do
-    before :each do
-      instances[:db] = [{:instance_id => 'i-0000001'}, {:instance_id => 'i-0000002'}]
-    end
+    let (:instances) { [
+        stub_instance(:instance_id => 'i-0000001', :role => :db),
+        stub_instance(:instance_id => 'i-0000002', :role => :db)
+    ] }
 
     it { should_not be_empty }
     it { should be_running }
@@ -97,10 +102,11 @@ describe Cloudfinder::EC2::Cluster do
   end
 
   context 'when created with multiple db and app instances' do
-    before :each do
-      instances[:db]  = [{:instance_id => 'i-0000001'}]
-      instances[:app] = [{:instance_id => 'i-0000002'}, {:instance_id => 'i-0000003'}]
-    end
+    let (:instances) { [
+        stub_instance(:instance_id => 'i-0000001', :role => :db),
+        stub_instance(:instance_id => 'i-0000002', :role => :app),
+        stub_instance(:instance_id => 'i-0000003', :role => :app)
+    ] }
 
     it { should_not be_empty }
     it { should be_running }
@@ -117,4 +123,9 @@ describe Cloudfinder::EC2::Cluster do
       expect(subject.list_roles).to eq([:db, :app])
     end
   end
+
+  def stub_instance(data)
+    Cloudfinder::EC2::Instance.new(data)
+  end
+
 end
