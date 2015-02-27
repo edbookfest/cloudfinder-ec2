@@ -23,6 +23,10 @@ describe Cloudfinder::EC2::Cluster do
     it 'should not have unknown instance' do
       expect(subject).not_to have_instance(unknown_instance_id)
     end
+
+    it 'should throw when getting unknown instance'  do
+      expect {subject.get_instance(unknown_instance_id)}.to raise_error(RangeError)
+    end
   end
 
   shared_examples_for 'defined role with instances' do |role_name, instance_count|
@@ -40,8 +44,16 @@ describe Cloudfinder::EC2::Cluster do
       expect(subject).to have_instance(instance_id)
     end
 
+    it "should get instance object for instance id #{instance_id}" do
+      instance = subject.get_instance(instance_id)
+      expect(instance).to be_a Cloudfinder::EC2::Instance
+      expect(instance.instance_id).to eq instance_id
+    end
+
     it "should return instance object for #{role_name}:##{instance_index}" do
-      expect(subject.list_role_instances(role_name)[instance_index]).to be_a Cloudfinder::EC2::Instance
+      instance = subject.list_role_instances(role_name)[instance_index]
+      expect(instance).to be_a Cloudfinder::EC2::Instance
+      expect(instance.instance_id).to eq instance_id
     end
 
     it "should list the #{role_name}:##{instance_index} instance for the correct role" do

@@ -8,7 +8,7 @@ module Cloudfinder
       # @return [Cloudfinder::EC2::Cluster]
       def initialize(args)
         @cluster_name = args[:cluster_name]
-        @instances = args[:instances]
+        @instances    = args[:instances]
       end
 
       # @return [bool]
@@ -30,18 +30,24 @@ module Cloudfinder
       # @param [string] instance_id
       # @return [bool]
       def has_instance?(instance_id)
-        instances.any? {|instance| instance.instance_id == instance_id}
+        instances.any? { |instance| instance.instance_id == instance_id }
+      end
+
+      def get_instance(instance_id)
+        found_instances = instances.select { |instance| instance.instance_id == instance_id }
+        raise(RangeError, "#{instance_id} is not part of the #{@cluster_name} cluster") if found_instances.empty?
+        found_instances.first
       end
 
       # @return [Array<symbol>]
       def list_roles
-        instances.group_by {|instance| instance.role}.keys
+        instances.group_by { |instance| instance.role }.keys
       end
 
       # @param [symbol] role
       # @return [Array<Cloudfinder::EC2::Instance>]
       def list_role_instances(role)
-        instances.select {|instance| instance.role === role }
+        instances.select { |instance| instance.role === role }
       end
 
       private
