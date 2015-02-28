@@ -7,11 +7,19 @@ describe Cloudfinder::EC2::Cluster do
     it 'should have cluster name' do
       expect(subject.cluster_name).to eq(cluster_name)
     end
+
+    it 'should include cluster name in hash representation' do
+      expect(subject.to_hash[:cluster_name]).to eq cluster_name
+    end
   end
 
   shared_examples_for 'undefined role' do |rolename|
     it "should not have #{rolename} role" do
       expect(subject).not_to have_role(rolename)
+    end
+
+    it "should not have #{rolename} in hash representation" do
+      expect(subject.to_hash[:roles]).not_to have_key rolename
     end
 
     it "should have empty instances for #{rolename} role" do
@@ -32,6 +40,14 @@ describe Cloudfinder::EC2::Cluster do
   shared_examples_for 'defined role with instances' do |role_name, instance_count|
     it "should have #{role_name} role" do
       expect(subject).to have_role(role_name)
+    end
+
+    it "should have #{role_name} in hash representation" do
+      expect(subject.to_hash[:roles]).to have_key role_name
+    end
+
+    it "should have #{instance_count} elements for #{role_name} in hash representation" do
+      expect(subject.to_hash[:roles][role_name].count).to eq instance_count
     end
 
     it "should list #{instance_count} instances for the #{role_name} role" do
@@ -59,6 +75,11 @@ describe Cloudfinder::EC2::Cluster do
     it "should list the #{role_name}:##{instance_index} instance for the correct role" do
       listed_instance = subject.list_role_instances(role_name)[instance_index]
       expect(listed_instance.instance_id).to eq(instance_id)
+    end
+
+    it "should include #{role_name}:##{instance_index} in hash representation" do
+      instance = subject.get_instance(instance_id)
+      expect(subject.to_hash[:roles][role_name][instance_index]).to eq instance.to_hash
     end
   end
 

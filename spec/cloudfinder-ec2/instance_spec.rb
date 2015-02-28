@@ -21,6 +21,10 @@ describe Cloudfinder::EC2::Instance do
         value = subject.method("#{attribute}").call
         expect { value << 'foo' }.to raise_error
       end
+
+      it "should include #{attribute} in hash representation" do
+        expect(subject.to_hash[attribute]).to eq initial_data[attribute]
+      end
     end
   end
 end

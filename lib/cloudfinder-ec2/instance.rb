@@ -17,6 +17,18 @@ module Cloudfinder
         @private_dns = data[:private_dns].freeze
         @role        = data[:role]
       end
+
+      # @return [Hash<string>]
+      def to_hash
+        {
+            instance_id: @instance_id,
+            public_ip:   @public_ip,
+            public_dns:  @public_dns,
+            private_dns: @private_dns,
+            private_ip:  @private_ip,
+            role:        @role
+        }
+      end
     end
   end
 end

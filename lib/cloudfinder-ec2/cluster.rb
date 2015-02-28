@@ -50,6 +50,32 @@ module Cloudfinder
         instances.select { |instance| instance.role === role }
       end
 
+      # Return the current cluster as a simple nested hash, suitable for rendering to JSON or similar
+      #
+      #   {
+      #      cluster_name: 'production',
+      #      roles: {
+      #        db: [
+      #           {instance_id: 'i-00000001', public_ip: '123.456.789.123',...}
+      #        ]
+      #      }
+      #   }
+      #
+      # @return [Hash]
+      def to_hash
+        hash = {
+            cluster_name: @cluster_name,
+            roles:        {}
+        }
+
+        instances.each do |instance|
+          hash[:roles][instance.role] = [] unless hash[:roles][instance.role]
+          hash[:roles][instance.role] << instance.to_hash
+        end
+
+        hash
+      end
+
       private
 
       # @return [Array<Cloudfinder::EC2::Instance>]
