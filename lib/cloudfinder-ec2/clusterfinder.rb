@@ -57,14 +57,14 @@ module Cloudfinder
       # @param [Struct] instance
       # @return [bool]
       def in_cluster?(instance)
-        find_tag_value(instance, 'cloudfinder-cluster') === @cluster_name
+        find_tag_value(instance, CLUSTER_TAG_NAME) === @cluster_name
       end
 
 
       # @param [Struct] instance
       # @return [bool]
       def has_role?(instance)
-        instance.tags.any? { |tag| tag[:key] === 'cloudfinder-role' }
+        instance.tags.any? { |tag| tag[:key] === ROLE_TAG_NAME }
       end
 
       # @param [Struct] instance
@@ -72,7 +72,7 @@ module Cloudfinder
       def new_instance(instance)
         Cloudfinder::EC2::Instance.new(
             instance_id: instance[:instance_id],
-            role:        find_tag_value(instance, 'cloudfinder-role').to_sym,
+            role:        find_tag_value(instance, ROLE_TAG_NAME).to_sym,
             public_ip:   instance[:public_ip_address],
             private_ip:  instance[:private_ip_address],
             public_dns:  instance[:public_dns_name],

@@ -19,9 +19,9 @@ module Cloudfinder
         }
 
         find_instance_tags.each do |tag|
-          if tag[:key] === 'cloudfinder-cluster'
+          if tag[:key] === CLUSTER_TAG_NAME
             result[:cluster_name] = tag[:value]
-          elsif tag[:key] === 'cloudfinder-role'
+          elsif tag[:key] === ROLE_TAG_NAME
             result[:cluster_role] = tag[:value].to_sym
           end
         end

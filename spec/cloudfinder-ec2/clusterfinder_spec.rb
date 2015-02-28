@@ -232,11 +232,11 @@ describe Cloudfinder::EC2::Clusterfinder do
     end
 
     if args[:cluster_tag]
-      instance[:tags] << { key: 'cloudfinder-cluster', value: args[:cluster_tag] }
+      instance[:tags] << { key: Cloudfinder::EC2::CLUSTER_TAG_NAME, value: args[:cluster_tag] }
     end
 
     if args[:role_tag]
-      instance[:tags] << { key: 'cloudfinder-role', value: args[:role_tag] }
+      instance[:tags] << { key: Cloudfinder::EC2::ROLE_TAG_NAME, value: args[:role_tag] }
     end
 
     instance

@@ -97,12 +97,12 @@ describe Cloudfinder::EC2::Detector do
         end
 
         context 'when instance has no cloudfinder-cluster tag' do
-          let (:tags) { [stub_tag('cloudfinder-role', 'anything')] }
+          let (:tags) { [stub_tag(Cloudfinder::EC2::ROLE_TAG_NAME, 'anything')] }
           include_examples 'instance outside cluster'
         end
 
         context 'when instance has no cloudfinder-role tag' do
-          let (:tags) { [stub_tag('cloudfinder-cluster', 'anything')] }
+          let (:tags) { [stub_tag(Cloudfinder::EC2::CLUSTER_TAG_NAME, 'anything')] }
           include_examples 'instance outside cluster'
         end
       end
@@ -110,7 +110,10 @@ describe Cloudfinder::EC2::Detector do
       context 'when part of cluster' do
         let (:cluster_name) { 'qa' }
         let (:cluster_role) { 'app' }
-        let (:tags) { [stub_tag('cloudfinder-cluster', cluster_name), stub_tag('cloudfinder-role', cluster_role)] }
+        let (:tags) { [
+            stub_tag(Cloudfinder::EC2::CLUSTER_TAG_NAME, cluster_name),
+            stub_tag(Cloudfinder::EC2::ROLE_TAG_NAME, cluster_role)
+        ] }
 
         include_examples 'instance with metadata'
 
