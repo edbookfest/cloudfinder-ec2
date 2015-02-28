@@ -1,4 +1,4 @@
-describe Cloudfinder::EC2::Command::List, focus: true do
+describe Cloudfinder::EC2::Command::List do
   let (:detector)         { spy(Cloudfinder::EC2::Detector) }
   let (:detector_result)  { { cluster_name: detected_cluster, cluster_role: 'db', region: detected_region } }
   let (:cluster_finder)   { spy(Cloudfinder::EC2::Clusterfinder) }
