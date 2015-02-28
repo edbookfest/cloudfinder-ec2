@@ -42,7 +42,10 @@ module Cloudfinder
         # @return void
         def execute(query = {})
           unless query[:region] && query[:cluster_name]
-            query = autodetect_cluster_or_throw.merge(query)
+            detected = autodetect_cluster_or_throw
+            [:region, :cluster_name].each do |key|
+              query[key] = detected[key] if query[key].nil?
+            end
           end
 
           cluster = @finder.find(query)

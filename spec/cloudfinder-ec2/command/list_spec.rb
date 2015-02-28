@@ -95,6 +95,17 @@ describe Cloudfinder::EC2::Command::List, focus: true do
       include_examples 'render cluster as JSON'
     end
 
+    context 'when specified region and cluster name are nil' do
+      before :each do
+        expect(detector).to receive(:detect_cluster).and_return detector_result
+        subject.execute(region: nil, cluster_name: nil)
+      end
+
+      include_examples 'find cluster by detected name'
+      include_examples 'find cluster in detected region'
+      include_examples 'render cluster as JSON'
+    end
+
     context 'when cluster detector throws exception' do
       before :each do
         expect(detector).to receive(:detect_cluster).and_raise Errno::ENETUNREACH
