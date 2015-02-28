@@ -1,0 +1,63 @@
+#!/usr/bin/env ruby
+require 'cloudfinder-ec2'
+require 'slop'
+
+opts = Slop.new strict: true, help: true do
+  banner (<<-eos).gsub(/^ +/m, '')
+    Finds running EC2 instances using cloudfinder-cluster and cloudfinder-role tags
+
+    Requires credentials authorised for read-only access to the AWS API - by default
+    will look in:
+
+    * ENV['AWS_ACCESS_KEY_ID'] and ENV['AWS_SECRET_ACCESS_KEY'] (not recommended)
+    * a credentials file at ~/.aws/credentials
+    * an instance's configured IAM role when running on EC2 (recommended)
+
+    Credentials are more fully documented at
+    http://docs.aws.amazon.com/sdkforruby/api/index.html#Credentials
+  eos
+
+  command :list do
+    description 'Output details of the running cluster as JSON'
+    banner      (<<-eos).gsub(/^ +/m, '')
+      Display the details of a running cluster as JSON
+      ------------------------------------------------
+      Usage: cloudfinder-ec2 list [--cluster-name=production] [--region=eu-west-1]
+
+      By default, attempts to autodetect the name and/or region of the cluster from the EC2
+      metadata of this instance. If this is not an EC2 instance this will fail.
+
+      If you specify both the --cluster-name and --region arguments then autodetection will
+      be skipped.
+    eos
+
+    on '--cluster-name', 'Name of the cluster to load instead of autodetecting', argument: :optional
+    on '--region', 'EC2 region to search instead of autodetecting', argument: :optional
+
+    run do |opts|
+      Cloudfinder::EC2::Command::List.factory.execute(
+          cluster_name: opts['cluster-name'],
+          region: opts['region']
+      )
+    end
+  end
+
+  on '--version', 'Display the version' do
+    puts Cloudfinder::EC2::VERSION
+  end
+
+  # Treat running without a command as an error
+  run do
+    raise(Slop::InvalidCommandError, 'ERROR: You must specify the cloudfinder-command to run')
+  end
+
+end
+
+# Run the command
+begin
+  opts.parse
+rescue Slop::Error => e
+  STDERR.puts e.message
+  puts ''
+  puts opts # print help
+end

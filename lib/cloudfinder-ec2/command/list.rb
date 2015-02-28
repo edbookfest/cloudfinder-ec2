@@ -4,6 +4,18 @@ module Cloudfinder
     module Command
       class List
 
+        # Factory an instance of the list command with concrete dependencies
+        #
+        # @return [Object]
+        def self.factory
+          self.new(
+              Cloudfinder::EC2::Clusterfinder.new,
+              Cloudfinder::EC2::Detector.new,
+              STDOUT,
+              STDERR
+          )
+        end
+
         # @param [Cloudfinder::EC2::Clusterfinder] finder
         # @param [Cloudfinder::EC2::Detector] detector
         # @param [IO] stdout

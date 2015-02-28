@@ -1,4 +1,5 @@
 require 'aws-sdk'
+require 'cloudfinder-ec2/version'
 require 'cloudfinder-ec2/consts'
 require 'cloudfinder-ec2/instance'
 require 'cloudfinder-ec2/cluster'
