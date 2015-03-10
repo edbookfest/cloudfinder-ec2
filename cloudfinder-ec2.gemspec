@@ -19,7 +19,7 @@ Gem::Specification.new do |gem|
   gem.require_paths = ["lib"]
 
   gem.add_dependency 'aws-sdk', '~>2.0'
-  gem.add_dependency 'slop',    '~>3.6'
+  gem.add_dependency 'slop',    '~>3.4'
 
   gem.add_development_dependency 'rake'
   gem.add_development_dependency 'rspec'
