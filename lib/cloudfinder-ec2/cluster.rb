@@ -44,6 +44,11 @@ module Cloudfinder
         instances.group_by { |instance| instance.role }.keys
       end
 
+      # @return [Array<Cloudfinder::EC2::Instance>]
+      def list_instances
+        instances
+      end
+
       # @param [symbol] role
       # @return [Array<Cloudfinder::EC2::Instance>]
       def list_role_instances(role)

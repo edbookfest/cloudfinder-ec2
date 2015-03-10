@@ -37,6 +37,13 @@ describe Cloudfinder::EC2::Cluster do
     end
   end
 
+  shared_examples_for 'running instances' do |instance_ids|
+    it 'should list array of all instances' do
+      found_instances = subject.list_instances.map {|instance| instance.instance_id}
+      expect(found_instances).to eq(instance_ids)
+    end
+  end
+
   shared_examples_for 'defined role with instances' do |role_name, instance_count|
     it "should have #{role_name} role" do
       expect(subject).to have_role(role_name)
@@ -106,6 +113,7 @@ describe Cloudfinder::EC2::Cluster do
     include_examples 'cluster'
     include_examples('undefined role', :'any other')
     include_examples('undefined instance', 'i-0000002')
+    include_examples('running instances', ['i-0000001'])
     include_examples('defined role with instances', :db, 1)
     include_examples('running instance in role', :db, 0, 'i-0000001')
 
@@ -125,6 +133,7 @@ describe Cloudfinder::EC2::Cluster do
     include_examples 'cluster'
     include_examples('undefined role', :'any other')
     include_examples('undefined instance', 'i-0000003')
+    include_examples('running instances', ['i-0000001', 'i-0000002'])
     include_examples('defined role with instances', :db, 2)
     include_examples('running instance in role', :db, 0, 'i-0000001')
     include_examples('running instance in role', :db, 1, 'i-0000002')
@@ -146,6 +155,7 @@ describe Cloudfinder::EC2::Cluster do
     include_examples 'cluster'
     include_examples('undefined role', :'any other')
     include_examples('undefined instance', 'i-0000004')
+    include_examples('running instances', ['i-0000001', 'i-0000002', 'i-0000003'])
     include_examples('defined role with instances', :db, 1)
     include_examples('defined role with instances', :app, 2)
     include_examples('running instance in role', :db, 0, 'i-0000001')
