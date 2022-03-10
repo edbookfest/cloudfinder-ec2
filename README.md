@@ -1,3 +1,6 @@
+# ABANDONED PROJECT
+** This package is abandoned and will not be maintained. It was working (though not recently updated) as at 9th March 2022). **
+
 # Cloudfinder::EC2
 
 [![Build Status](https://travis-ci.org/edbookfest/cloudfinder-ec2.png)](https://travis-ci.org/edbookfest/cloudfinder-ec2)
